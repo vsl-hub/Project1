@@ -1,27 +1,71 @@
-pipeline {
-    agent any
+pipeline { 
 
-    stages {
-        stage('Build') {
-            steps {
-                echo 'Building.. This is the build phase'
-            }
-        }
-        stage('Test') {
-            steps {
-                echo 'Testing.. This is the testing phase'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying....  This is the deployment phase'
-            }
-        }
-	stage('Postdeploy') {
-		steps {
-			echo 'Postdeployment phase..??????????'
-		}
-	}
+    environment { 
+
+        registry = "vslhub/myfirstdock" 
+
+        registryCredential = 'dockerhub' 
+
+        dockerImage = '' 
+
     }
-}
 
+    agent any 
+
+    stages { 
+
+        stage('Cloning our Git') { 
+
+            steps { 
+
+                git 'https://github.com/vsl-hub/dockerTrial.git' 
+
+            }
+
+        } 
+
+        stage('Building our image') { 
+
+            steps { 
+
+                script { 
+
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+
+                }
+
+            } 
+
+        }
+
+        stage('Deploy our image') { 
+
+            steps { 
+
+                script { 
+
+                    docker.withRegistry( '', registryCredential ) { 
+
+                        dockerImage.push() 
+
+                    }
+
+                } 
+
+            }
+
+        } 
+
+        stage('Cleaning up') { 
+
+            steps { 
+
+                sh "docker rmi $registry:$BUILD_NUMBER" 
+
+            }
+
+        } 
+
+    }
+
+}
