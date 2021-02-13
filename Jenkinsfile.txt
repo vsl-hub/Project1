@@ -2,7 +2,7 @@ pipeline {
 
     environment { 
 
-        registry = "vslhub/myfirstdock" 
+        registry = "vslhub/ubuntu-nginx" 
 
         registryCredential = 'dockerhub' 
 
@@ -13,16 +13,6 @@ pipeline {
     agent any 
 
     stages { 
-
-        stage('Cloning our Git') { 
-
-            steps { 
-
-                git 'https://github.com/vsl-hub/dockerTrial.git' 
-
-            }
-
-        } 
 
         stage('Building our image') { 
 
@@ -56,16 +46,7 @@ pipeline {
 
         } 
 
-        stage('Cleaning up') { 
-
-            steps { 
-
-                sh "docker rmi $registry:$BUILD_NUMBER" 
-
-            }
-
-        } 
-
+        
     }
 
 }
